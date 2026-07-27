@@ -25,6 +25,11 @@ manejar en el código (ver `src/aemet_pipeline/extract.py`):
   una URL temporal donde están; hay que hacer una segunda petición.
 - Esa segunda respuesta viene codificada en **latin-1**, no en UTF-8 — si se
   decodifica mal, los acentos y la "ñ" salen corruptos.
+- La capa gratuita tiene un **rate limit estricto**: la primera vez que
+  lancé el workflow público de GitHub Actions falló con `429 Too Many
+  Requests` porque acababa de probar la key en local pocos minutos antes.
+  El cliente (`extract.py`) reintenta con backoff respetando `Retry-After`
+  si el servidor lo manda.
 
 ## Arquitectura
 
