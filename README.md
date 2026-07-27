@@ -150,10 +150,15 @@ Para activarlo en tu propio fork/repo:
   sería abrir una superficie de ataque innecesaria. Cada entorno tiene su
   propia base; el punto de la ejecución pública es demostrar que el
   pipeline funciona, no compartir almacenamiento.
-- **Heap de Metabase acotado (`JAVA_OPTS=-Xmx512m` + `mem_limit: 768m`)**:
+- **Heap de Metabase acotado (`JAVA_OPTS=-Xmx512m` + `mem_limit: 1024m`)**:
   antes de desplegar en el homelab comprobé por SSH la RAM real disponible
   (`docker stats` + `free -h`) — Metabase es el único componente que pesa
   de verdad (es una JVM) frente al resto de este stack, que es ruido. Para
   consultar una tabla de unas pocas filas al día no hace falta el heap por
   defecto que recomienda Metabase (1GB+); limitarlo es más responsable con
-  un host que ya corre otros 19 contenedores.
+  un host que ya corre otros 19 contenedores. Primer intento con
+  `mem_limit: 768m`: se quedó al límite justo durante el arranque
+  (760/768MB, sincronizando su base de datos de ejemplo interna) — nada
+  llegó a caerse (`OOMKilled: false`, 0 reinicios), pero estaba demasiado
+  al filo para confiar en él bajo carga real. Subido a `1024m`, con margen
+  de sobra dado que el host tiene un 75%+ de RAM libre.

@@ -66,7 +66,7 @@ services:
     environment:
       JAVA_OPTS: "-Xmx512m"
       MB_JETTY_MAXTHREADS: "8"
-    mem_limit: 768m
+    mem_limit: 1024m
     ports:
       - "3010:3000"
     networks:
