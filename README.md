@@ -12,7 +12,7 @@ ejecución sobre **el mismo código**:
    en GitHub Pages. Así cualquiera puede comprobar que el pipeline funciona
    de verdad, en vivo, sin depender de que mi mini PC esté encendido.
 
-**Snapshot en vivo:** `https://<tu-usuario>.github.io/aemet-data-pipeline/`
+**Snapshot en vivo:** https://dpinerodelgado.github.io/aemet-data-pipeline/
 (se actualiza solo cada 3 horas vía GitHub Actions).
 
 ## Por qué este proyecto
