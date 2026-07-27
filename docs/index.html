@@ -4,11 +4,35 @@
 <meta charset="utf-8">
 <title>aemet-data-pipeline — snapshot público</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.4rem; }
+  .meta { color: gray; font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .temp-bar { fill: #4f8ef7; }
+  .axis-label, .value-label { font-size: 11px; fill: currentColor; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #8884; }
+</style>
 </head>
-<body style="font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem;">
-  <h1>aemet-data-pipeline</h1>
-  <p>Todavía no se ha ejecutado ninguna corrida programada. Esta página se
-  regenera automáticamente en cada ejecución del workflow
-  <code>scheduled-run.yml</code> (ver pestaña Actions del repositorio).</p>
+<body>
+  <h1>Predicción meteorológica — Madrid</h1>
+  <p class="meta">
+    Generado automáticamente por GitHub Actions en cada ejecución programada.
+    Última ejecución: 2026-07-27 16:23 UTC. Este snapshot corre de forma independiente
+    del homelab: prueba que el pipeline funciona sin depender de que el
+    servidor de casa esté encendido.
+  </p>
+  <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Temperaturas máximas y mínimas previstas"><rect x="46.6" y="75.7" width="49.7" height="114.3" class="temp-bar" /><text x="71.4" y="212" class="axis-label" text-anchor="middle">07-27</text><text x="71.4" y="69.7" class="value-label" text-anchor="middle">34°</text><rect x="129.4" y="45.2" width="49.7" height="114.3" class="temp-bar" /><text x="154.3" y="212" class="axis-label" text-anchor="middle">07-28</text><text x="154.3" y="39.2" class="value-label" text-anchor="middle">38°</text><rect x="212.3" y="45.2" width="49.7" height="99.0" class="temp-bar" /><text x="237.1" y="212" class="axis-label" text-anchor="middle">07-29</text><text x="237.1" y="39.2" class="value-label" text-anchor="middle">38°</text><rect x="295.1" y="45.2" width="49.7" height="106.7" class="temp-bar" /><text x="320.0" y="212" class="axis-label" text-anchor="middle">07-30</text><text x="320.0" y="39.2" class="value-label" text-anchor="middle">38°</text><rect x="378.0" y="30.0" width="49.7" height="129.5" class="temp-bar" /><text x="402.9" y="212" class="axis-label" text-anchor="middle">07-31</text><text x="402.9" y="24.0" class="value-label" text-anchor="middle">40°</text><rect x="460.9" y="45.2" width="49.7" height="99.0" class="temp-bar" /><text x="485.7" y="212" class="axis-label" text-anchor="middle">08-01</text><text x="485.7" y="39.2" class="value-label" text-anchor="middle">38°</text><rect x="543.7" y="45.2" width="49.7" height="99.0" class="temp-bar" /><text x="568.6" y="212" class="axis-label" text-anchor="middle">08-02</text><text x="568.6" y="39.2" class="value-label" text-anchor="middle">38°</text></svg>
+  <table>
+    <thead><tr><th>Fecha</th><th>Temperatura</th><th>Prob. lluvia</th><th>Cielo</th></tr></thead>
+    <tbody><tr><td>2026-07-27</td><td>19°C – 34°C</td><td>0%</td><td>—</td></tr>
+<tr><td>2026-07-28</td><td>23°C – 38°C</td><td>0%</td><td>Despejado</td></tr>
+<tr><td>2026-07-29</td><td>25°C – 38°C</td><td>0%</td><td>Despejado</td></tr>
+<tr><td>2026-07-30</td><td>24°C – 38°C</td><td>0%</td><td>Despejado</td></tr>
+<tr><td>2026-07-31</td><td>23°C – 40°C</td><td>20%</td><td>Intervalos nubosos</td></tr>
+<tr><td>2026-08-01</td><td>25°C – 38°C</td><td>10%</td><td>Intervalos nubosos</td></tr>
+<tr><td>2026-08-02</td><td>25°C – 38°C</td><td>5%</td><td>Poco nuboso</td></tr></tbody>
+  </table>
 </body>
 </html>
