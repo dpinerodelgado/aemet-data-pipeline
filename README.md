@@ -150,15 +150,23 @@ Para activarlo en tu propio fork/repo:
   sería abrir una superficie de ataque innecesaria. Cada entorno tiene su
   propia base; el punto de la ejecución pública es demostrar que el
   pipeline funciona, no compartir almacenamiento.
-- **Heap de Metabase acotado (`JAVA_OPTS=-Xmx512m` + `mem_limit: 1024m`)**:
+- **Heap de Metabase acotado (`JAVA_OPTS=-Xmx512m`) + `mem_limit: 1536m`**:
   antes de desplegar en el homelab comprobé por SSH la RAM real disponible
   (`docker stats` + `free -h`) — Metabase es el único componente que pesa
-  de verdad (es una JVM) frente al resto de este stack, que es ruido. Para
-  consultar una tabla de unas pocas filas al día no hace falta el heap por
-  defecto que recomienda Metabase (1GB+); limitarlo es más responsable con
-  un host que ya corre otros 19 contenedores. Primer intento con
-  `mem_limit: 768m`: se quedó al límite justo durante el arranque
-  (760/768MB, sincronizando su base de datos de ejemplo interna) — nada
-  llegó a caerse (`OOMKilled: false`, 0 reinicios), pero estaba demasiado
-  al filo para confiar en él bajo carga real. Subido a `1024m`, con margen
-  de sobra dado que el host tiene un 75%+ de RAM libre.
+  de verdad (es una JVM) frente al resto de este stack, que es ruido.
+  Historial real de ajuste, verificado en cada paso con `docker stats` +
+  `docker inspect ... OOMKilled` (nunca se llegó a caer, pero se ajustó por
+  precaución):
+  1. `mem_limit: 768m` → se quedó pegado al límite (760/768MB) durante el
+     arranque.
+  2. `mem_limit: 1024m` → volvió a pegarse al límite (1019/1024MB).
+     Inspeccioné el desglose real del cgroup (`memory.stat`: `anon` ≈
+     885MB) para descartar que fuera solo caché de página inflando el
+     número (como pasa a veces con `docker stats`) — no lo era, era uso
+     real. Confirmé además con `ps aux` dentro del contenedor que el JVM
+     sí respeta `-Xmx512m`; el resto es *overhead* fuera de heap
+     (metaspace, hilos, buffers de Jetty) típico de Metabase por estar
+     escrito en Clojure (carga muchas más clases que una app Java típica).
+  3. `mem_limit: 1536m` (definitivo): con un host al 75%+ de RAM libre, no
+     tiene sentido pelear por acotarlo más fino y arriesgar un
+     reinicio en producción por un ahorro de unos cientos de MB.
