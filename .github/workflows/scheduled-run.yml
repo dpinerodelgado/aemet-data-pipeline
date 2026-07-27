@@ -1,0 +1,54 @@
+name: Scheduled run (pública)
+
+# Corre el mismo pipeline que el homelab, pero aquí contra una base SQLite
+# efímera (vive y muere con el runner) y publica un snapshot estático en
+# GitHub Pages. El objetivo no es el histórico completo (eso vive en el
+# Postgres del homelab), sino demostrar en abierto que el pipeline sigue
+# funcionando de verdad, sin depender de que el mini PC esté encendido.
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scheduled-run
+  cancel-in-progress: false
+
+jobs:
+  run-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+      AEMET_MUNICIPIO_ID: "28079"
+      DATABASE_URL: "sqlite:///aemet_ci.db"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar el paquete
+        run: pip install .
+
+      - name: Ejecutar el pipeline
+        run: python -m aemet_pipeline.run_pipeline
+
+      - name: Generar snapshot público (docs/index.html)
+        run: python scripts/publish_snapshot.py
+
+      - name: Publicar snapshot si hay cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          if git diff --cached --quiet; then
+            echo "Sin cambios en el snapshot, no se hace commit."
+          else
+            git commit -m "chore: actualizar snapshot público [skip ci]"
+            git push
+          fi

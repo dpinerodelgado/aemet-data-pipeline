@@ -1,0 +1,73 @@
+# Despliegue de producción en el homelab.
+#
+# - postgres: almacenamiento persistente de las predicciones.
+# - pipeline: NO se queda corriendo; ofelia lo lanza como un contenedor
+#   nuevo (job-run) cada 3 horas y lo destruye al terminar.
+# - ofelia: cron nativo de Docker, mismo patrón usado ya en el resto del
+#   homelab de "un servicio, un stack".
+# - metabase: dashboard para consultar el histórico (solo accesible dentro
+#   de la red homelab / vía Nginx Proxy Manager, nunca expuesto a internet).
+#
+# Requiere la red externa "homelab" ya creada (docker network create homelab)
+# y un fichero .env junto a este compose (ver .env.example).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aemet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aemet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: aemet
+    volumes:
+      - aemet_postgres_data:/var/lib/postgresql/data
+    networks:
+      - homelab
+
+  # Imagen que ofelia lanzará periódicamente. No tiene "restart" ni queda
+  # corriendo: build once, ofelia crea instancias efímeras a partir de ella.
+  pipeline:
+    build: .
+    image: aemet-pipeline:latest
+    profiles: ["build-only"]
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: aemet-ofelia
+    command: daemon --docker
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homelab
+    labels:
+      ofelia.job-run.aemet-pipeline.schedule: "0 0 */3 * * *"
+      ofelia.job-run.aemet-pipeline.image: "aemet-pipeline:latest"
+      ofelia.job-run.aemet-pipeline.network: "homelab"
+      ofelia.job-run.aemet-pipeline.delete: "true"
+      ofelia.job-run.aemet-pipeline.environment: >-
+        ["AEMET_API_KEY=${AEMET_API_KEY}",
+        "AEMET_MUNICIPIO_ID=${AEMET_MUNICIPIO_ID}",
+        "DATABASE_URL=postgresql+psycopg2://aemet:${POSTGRES_PASSWORD}@aemet-postgres:5432/aemet",
+        "UPTIME_KUMA_PUSH_URL=${UPTIME_KUMA_PUSH_URL}"]
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: aemet-metabase
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "3010:3000"
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
+
+volumes:
+  aemet_postgres_data:
