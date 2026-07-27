@@ -60,6 +60,13 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+    # Heap y threads de Jetty acotados: es un dashboard personal sobre una
+    # tabla de unas pocas filas al día, no hace falta el heap por defecto
+    # (Metabase suele recomendar 1GB+; aquí le basta con una fracción).
+    environment:
+      JAVA_OPTS: "-Xmx512m"
+      MB_JETTY_MAXTHREADS: "8"
+    mem_limit: 768m
     ports:
       - "3010:3000"
     networks:
