@@ -66,11 +66,18 @@ services:
     environment:
       JAVA_OPTS: "-Xmx512m"
       MB_JETTY_MAXTHREADS: "8"
+      # Sin esto, la cuenta de admin y la conexión a Postgres que se
+      # configuran en el asistente web viven en la capa efímera del
+      # contenedor: cualquier recreación (Terraform, un redeploy, lo que
+      # sea) las borraría sin aviso.
+      MB_DB_FILE: /metabase-data/metabase.db
     mem_limit: 1536m
     ports:
       - "3010:3000"
     networks:
       - homelab
+    volumes:
+      - aemet_metabase_data:/metabase-data
 
 networks:
   homelab:
@@ -78,3 +85,4 @@ networks:
 
 volumes:
   aemet_postgres_data:
+  aemet_metabase_data:
